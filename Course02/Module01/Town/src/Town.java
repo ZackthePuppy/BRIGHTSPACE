@@ -33,17 +33,11 @@ public class Town {
 
     public void simulateBirth(int num) { // gets the value of num from passed parameters in main method, which contain
                                          // either 1 or 2
-        try {
-            System.out.print("Enter how many child/twin: ");
-            numberOfChildren += sc.nextInt() * num; // adds a value to the variable numberofchildren, and multiplies it
-                                                    // by either 1 or 2, depending on the passed parameter
+            numberOfChildren += num; 
             System.out.println("Successfully added!");
-        } catch (InputMismatchException e) {
-            System.out.print("Invalid input!");
-        }
     }
 
-    public void printStatistics() {
+    public void printStatistics() { //prints the number of adults and children
         System.out.println("STATISTICS\n");
         System.out.println("Adult's Population: " + numberOfAdults);
         System.out.println("Children's Population: " + numberOfChildren);

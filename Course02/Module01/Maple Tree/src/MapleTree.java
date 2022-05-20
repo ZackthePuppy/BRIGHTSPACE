@@ -1,6 +1,22 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
+/**
 
+* Java Course 2 Module 1
+
+*
+
+* @author Mike Lemuel Chan
+
+* @Description: getting the plant date, germination date and initial height, then displays it
+
+* @CreatedDate: 5/16/2022
+
+* @ModifiedDate: 5/16/2022
+
+*
+
+*/
 public class MapleTree {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);

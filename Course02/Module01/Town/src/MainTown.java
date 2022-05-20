@@ -1,10 +1,11 @@
 import java.util.Scanner;
 
 /**
+ * Java Course 2 Module 1
 * @author Mike Lemuel Chan
 * @Description: Initializes child and adult population, then displays it. Also, it can add twin child or single child.
-* @CreatedDate: 5/12/2022
-* @ModifiedDate: 5/12/2022
+* @CreatedDate: 5/16/2022
+* @ModifiedDate: 5/18/2022
 */
 
 public class MainTown {
