@@ -20,21 +20,22 @@ public abstract class Employee {
     }
 
     public double getBonus() {
-        int bonusPay = 100;
-
+        final int bonusPay = 100, maxPaycheck = 1000;
+        this.paycheck = getEarnings(); //gets the value from getEarning so that the paycheck will have a value
         Calendar calendar = Calendar.getInstance();
         calendar.set(2022, 5, 20); // sets the current date
         int weekNum = calendar.get(Calendar.WEEK_OF_MONTH); // get the week number from month
         int monthNum = calendar.get(Calendar.MONTH); // get the month number
 
-        if (this.birthMonth == monthNum && this.birthWeek == weekNum) {
-            this.paycheck = getEarnings() + bonusPay; //adds a bonus if the employee's birthday matches the current date
-            return this.paycheck;
+        if (this.birthMonth == monthNum && this.birthWeek == weekNum) { 
+            this.paycheck += bonusPay; //adds a bonus if the employee's birthday matches the current date
+            
         }
-        else {
-            this.paycheck = getEarnings();
-            return this.paycheck;
+        if (this.paycheck >= maxPaycheck){ //if paycheck exceeds 1000
+            this.paycheck = maxPaycheck;
         }
+        return this.paycheck;
+    
     }
 
     public abstract double getEarnings(); //abstract method
