@@ -6,14 +6,22 @@ public abstract class Employee {
     private int birthMonth, birthWeek;
     private double paycheck;
 
-    public Employee(String name, String sss, int birthMonth, int birthWeek) { // super constructor, gets the name, sss,
+    public Employee load(String name, String sss, int birthMonth, int birthWeek) { // super constructor, gets the name, sss,
                                                                               // birthmonth and birthweek
         this.name = name;
         this.sss = sss;
         this.birthMonth = birthMonth;
         this.birthWeek = birthWeek;
+        return this;
     }
 
+    // public String toString() { // automatically converts object into string
+    //     NumberFormat dollar = NumberFormat.getCurrencyInstance();
+    //     return "Employee Name: " + name +
+    //             "\nSocial Security Number: " + sss +
+    //             String.format("\nPaycheck %2s", dollar.format(getBonus()));
+    // }
+    
     public String toString() { // automatically converts object into string
         NumberFormat dollar = NumberFormat.getCurrencyInstance();
         return "Employee Name: " + name +

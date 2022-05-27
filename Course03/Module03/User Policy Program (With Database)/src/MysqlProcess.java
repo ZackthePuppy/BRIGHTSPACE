@@ -1,6 +1,6 @@
 import java.sql.*;
 
-public class MysqlProcess {
+public class MySQLProcess {
 
     //initialization for mysql used for connection later
 
@@ -19,14 +19,14 @@ public class MysqlProcess {
         Statement stmt = null;
 
         try {
-            conn = DriverManager.getConnection(dbURL + dbName, USER, PASS);
+            conn = DriverManager.getConnection(dbURL + dbName, USER, PASS); //get and connect the connection from given values above
 
-            stmt = conn.createStatement();
-            String sql = "select * from user_policies where date_registered <= '" + value + "' ";
-            ResultSet rs = stmt.executeQuery(sql);
+            stmt = conn.createStatement(); //creates a statement
+            String sql = "select * from user_policies where date_registered <= '" + value + "' "; //mySQL query
+            ResultSet rs = stmt.executeQuery(sql); //executes the query, and then stores the results in rs variable
 
             // Query results
-            while (rs.next()) {
+            while (rs.next()) { //loops while the resultset has values
                 // The field type needs to be specified
                 policyNo = rs.getString("policy_no");
                 userId = rs.getString("user_id");

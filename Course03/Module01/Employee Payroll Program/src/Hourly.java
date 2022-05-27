@@ -2,7 +2,7 @@ public class Hourly extends Employee {
 
     private double hourlyPay, hoursWorked;
 
-    public Hourly(String name, String sss, int birthMonth, int birthWeek, double hourlyPay, double hoursWorked) { // child
+    public Hourly load(String name, String sss, int birthMonth, int birthWeek, double hourlyPay, double hoursWorked) { // child
                                                                                                                   // constructor,
                                                                                                                   // gets
                                                                                                                   // the
@@ -14,9 +14,10 @@ public class Hourly extends Employee {
                                                                                                                   // from
                                                                                                                   // super
                                                                                                                   // class
-        super(name, sss, birthMonth, birthWeek);
+        super.load(name, sss, birthMonth, birthWeek);
         this.hourlyPay = hourlyPay;
         this.hoursWorked = hoursWorked;
+        return this;
     }
 
     public double getEarnings() {

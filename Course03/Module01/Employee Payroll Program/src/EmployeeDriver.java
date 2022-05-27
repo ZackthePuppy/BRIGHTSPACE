@@ -3,14 +3,14 @@ import java.util.Scanner;
 
 
 /**
- * Java Course 3 Unknown Module
+ * Java Course 3 Module 1
  *
  * @author Mike Lemuel Chan
  * @Description: Selects which type of employee, then based on selection, it
  *               will polymorph and show different results. Inheritance also
  *               included here
  * @CreatedDate: 5/20/2022
- * @ModifiedDate: 5/23/2022
+ * @ModifiedDate: 5/25/2022
  *
  */
 
@@ -75,14 +75,14 @@ public class EmployeeDriver {
                             System.out.print("Hours worked this past week: ");
                             hoursWorked = sc.nextDouble();
 
-                            employee [x] = new Hourly(name, sss, birthMonth, birthWeek, hourlyPay, hoursWorked); //calls the constructor and passes the value from here
+                            employee [x] = new Hourly().load(name, sss, birthMonth, birthWeek, hourlyPay, hoursWorked); //calls the constructor and passes the value from here
                         }
 
                         else if (choice.equals("2")){ //executes if user choose salaried
                             System.out.print("Salary: ");
                             salary = sc.nextDouble();
 
-                            employee [x] = new Salaried(name, sss, birthMonth, birthWeek, salary);
+                            employee [x] = new Salaried().load(name, sss, birthMonth, birthWeek, salary);
                         }
 
                         else if (choice.equals("3")){
@@ -93,7 +93,7 @@ public class EmployeeDriver {
                             System.out.print("Sales Commission Rate: ");
                             commissionRate = sc.nextDouble();
 
-                            employee [x] = new SalariedPlusCommission(name, sss, birthMonth, birthWeek, salary, salesWeek, commissionRate);
+                            employee [x] = new SalariedPlusCommission().load(name, sss, birthMonth, birthWeek, salary, salesWeek, commissionRate);
                         }                        
                         go.PauseClear();
                     }
