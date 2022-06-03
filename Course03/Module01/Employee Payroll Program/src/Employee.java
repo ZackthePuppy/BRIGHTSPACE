@@ -34,7 +34,6 @@ public abstract class Employee {
         this.paycheck = getEarnings(); // gets the value from getEarning so that the paycheck will have a value
 
         Calendar calendar = Calendar.getInstance(); //instantiates calendar so we can use it as a basis for the employee's birthday
-        calendar.set(2022, 5, 23); // sets the current date
         int weekNum = calendar.get(Calendar.WEEK_OF_MONTH); // get the week number from month
         int monthNum = calendar.get(Calendar.MONTH); // get the month number
 

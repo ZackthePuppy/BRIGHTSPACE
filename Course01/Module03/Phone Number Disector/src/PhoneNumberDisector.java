@@ -26,6 +26,7 @@ public class PhoneNumberDisector {
 
                 if (number.equalsIgnoreCase("Q")) { // executes IF user typed q OR Q
                     System.out.println("Thank you");
+                    sc.close();
                     break; // breaks the loop
                 }
 
@@ -47,7 +48,6 @@ public class PhoneNumberDisector {
                     System.out.print("\nPress ENTER to continue...");
                     sc.nextLine();
                 }
-                sc.close();
             } catch (StringIndexOutOfBoundsException e) { // it will only execute if the user didn't follow the
                                                           // instruction, example 123-4567
                 System.out.println("INVALID Number! Try again.");

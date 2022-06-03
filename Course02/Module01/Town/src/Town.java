@@ -20,15 +20,30 @@ public class Town {
     }
 
     public void initialize() {
+        while (true){
         try {
             System.out.print("Enter population of adults: ");
             numberOfAdults = sc.nextInt(); // gets the population of adults
 
             System.out.print("Enter population of children: ");
             numberOfChildren = sc.nextInt(); // gets the population of children
+
+            if (numberOfAdults <= 0 || numberOfChildren <= 0){
+                System.out.println("Population cannot be zero/negative!");
+                promptEnterKey();
+            }
+            else {
+                System.out.println("Added Successfully!");
+                promptEnterKey();
+                break; //breaks the endless loop if there arent' any errors
+            }
+
         } catch (InputMismatchException e) {
-            System.out.print("ERROR! Invalid input!");
+            System.out.println("ERROR! Invalid input!");
+            sc.nextLine();
+            promptEnterKey();
         }
+    }
     }
 
     public void simulateBirth(int num) { // gets the value of num from passed parameters in main method, which contain
