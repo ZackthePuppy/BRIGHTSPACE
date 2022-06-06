@@ -5,15 +5,12 @@ import java.util.*;
 public class Policy {
     private Scanner sc = new Scanner(System.in);
     Calendar calendar = Calendar.getInstance();
-    private int policyHolderID;
-    private double policyPremium;
 
     public void createPolicy() {
         calendar = Calendar.getInstance();
         DisplayDesign go = new DisplayDesign();
         PolicyHolder holder = new PolicyHolder();
-        Vehicle vehicle = new Vehicle();
-        int searchAcc, accNum, month, day, year, monthExp;
+        int searchAcc, accNum, month, day, year, monthExp, policyID;
 
         go.clearConsole();
 
@@ -27,15 +24,12 @@ public class Policy {
 
             
             if (accNum != 0) {
-                holder.policyHolder(accNum); //calls the policyholder class and sends the parameter's values to it
 
                 while (true) {
                     try {
                         go.clearConsole();
                         go.printBox("QUOTE POLICY FOR ACCOUNT #" + accNum);
 
-                        System.out.println(getPolicyHolderID());
-                        System.out.println(getPolicyPremium());
 
                         System.out.println("POLICY EFFECTIVE DATE");
                         System.out.print("Month [1-12]: ");
@@ -66,12 +60,14 @@ public class Policy {
                             monthExp = month + 6; // sets the expiry month
                             
 
-                            processPolicyQuery(month, day, year, monthExp, accNum, getPolicyHolderID(), getPolicyPremium()); // gets the policy
+                            policyID = processPolicyQuery(month, day, year, monthExp, accNum); // gets the policy
                                                                                                 // number from return
                                                                                                 // value
                             // passes the account number and policy number to be inserted in the
                             // policyholder table
                             go.pauseClear();
+                            
+                            holder.policyHolder(accNum, policyID); //calls the policyholder class and sends the parameter's values to it
                             break;
                             }
                         }
@@ -115,72 +111,50 @@ public class Policy {
 
     }
 
-    public int processPolicyQuery(int month, int day, int year, int monthExp, int accNum, int policyHolderNum, double policyPremium) { // method for processing the
+    public int processPolicyQuery(int month, int day, int year, int monthExp, int accNum) { // method for processing the
                                                                                             // query in
-        int policyNumber = 0; // mysql
+        int policyID = 0; // mysql
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
                 Statement stmt = conn.createStatement();) {
 
-            String query = "INSERT into policy (effectdate, expiredate, policyowner, policypremium) VALUES (?, ?, ?, ?)";
+            String query = "INSERT into policy (effectdate, expiredate, policyowner) VALUES (?, ?, ?)";
             PreparedStatement preparedStmt = conn.prepareStatement(query); // used preparedStatement to prevent sql
             // injection
 
             //conversion of util date to mysql date, because we cannot insert direct util date in mysql table
             calendar.set(year, month, day);
             java.util.Date dateUtil = calendar.getTime();
-            java.sql.Date date = new java.sql.Date(dateUtil.getTime());
+            java.sql.Date date = new java.sql.Date(dateUtil.getTime()); //for creating effective date
+
             calendar.set(year, monthExp, day);
             java.util.Date dateExpUtil = calendar.getTime();
-            java.sql.Date dateExp = new java.sql.Date(dateExpUtil.getTime());
+            java.sql.Date dateExp = new java.sql.Date(dateExpUtil.getTime()); //for policy's expiry date
 
             preparedStmt.setDate(1, (java.sql.Date) date);
             preparedStmt.setDate(2, (java.sql.Date) dateExp);
             preparedStmt.setInt(3, accNum);
-            preparedStmt.setDouble(4, policyPremium);
 
             preparedStmt.execute(); // finally executes the query
 
             ResultSet rs = stmt.executeQuery("select policynumber, effectdate, " +
             " expiredate from policy where policynumber = (select MAX(policynumber) from policy)");
             while (rs.next()) {
-                policyNumber = rs.getInt(1); //stores the policy number to a variable for us to be return later
-            System.out.println("Successfully created policy (#" + policyNumber + ")" +
+                policyID = rs.getInt(1); //stores the policy number id to a variable for us to be return later
+            System.out.println("POLICY #" + policyID  +
                     "\nEffective Date: " + rs.getString(2) +
                     "\nExpiry Date: " + rs.getString(3));
             }
-
-            stmt.executeUpdate("UPDATE policyholder set policy = " + policyNumber + " where id = " + policyHolderNum + ""); //updates the policy holder, we will put the policy number into them
 
 
         } catch (SQLException e) { // handles errors
             System.out.println("INVALID! " + e);
             System.out.println("Please try again later!");
         }
-        return policyNumber; //returns the number from query result
+        return policyID; //returns the number from query result
 
     }
 
 
     
-    public int getPolicyHolderID() {
-        return this.policyHolderID;
-    }
-
-    public double getPolicyPremium() {
-        return this.policyPremium;
-    }
-
-    public void setPolicyHolderID(int policyHolderNum) {
-        this.policyHolderID = policyHolderNum;
-    }
-
-    public void setPolicyPremium(double policyPremium) {
-        this.policyPremium = policyPremium;
-    }
-
-    public void call (double hatdog){
-
-    }
-
 
 }

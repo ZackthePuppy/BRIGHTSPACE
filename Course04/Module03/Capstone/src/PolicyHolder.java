@@ -9,7 +9,7 @@ public class PolicyHolder extends Policy {
     Calendar calendar = Calendar.getInstance();
     Vehicle vehicle = new Vehicle();
 
-    public void policyHolder(int accNum) {
+    public void policyHolder(int accNum, int policyID) {
         go.clearConsole();
         String choice;
         boolean mainLoop = true, hasPolicyHolder;
@@ -42,7 +42,7 @@ public class PolicyHolder extends Policy {
                                                                    // issued
 
                             if (policyNum != 0) { // executes if id found in query
-                                vehicle.policyHolderVehicle(policyNum, accNum, driverYear);
+                                vehicle.policyHolderVehicle(policyNum, accNum, driverYear, policyID);
                                 mainLoop = false; // finally ends the endless loop because existing policy holder was
                                                   // finally used
                             }

@@ -5,10 +5,9 @@ import java.util.Scanner;
 public class Vehicle {
     Scanner sc = new Scanner(System.in);
 
-    public void policyHolderVehicle(int policyHolderNum, int accNum, int driverYear) {
+    public void policyHolderVehicle(int policyHolderID, int accNum, int driverYear, int policyID) {
         RatingEngine ratingEngine = new RatingEngine();
         DisplayDesign go = new DisplayDesign();
-        Policy policy = new Policy();
         int vehicleNum, year;
         double vehiclePrice, vehiclePriceFactor = 0, premium, totalPremium = 0;
         String brand, model, type, fuel, color;
@@ -16,7 +15,7 @@ public class Vehicle {
 
         while (true) {
             try {
-                go.printBox("Policy Holder ID#" + policyHolderNum + " | Account #" + accNum);
+                go.printBox("Policy Holder ID#" + policyHolderID + " | Account #" + accNum);
                 System.out.print("Number of Vehicle: ");
                 vehicleNum = sc.nextInt();
 
@@ -123,15 +122,19 @@ public class Vehicle {
                                 x--;
                             }
 
-                            else { // finally runs when there is no errors
+                            else { // finally runs/adds the values when there is no errors
                                 premium = ratingEngine.engine(vehiclePrice, vehiclePriceFactor,
                                         driverYear); // calls the rating engine class, then it calculates the premium
                                                      // charge, and adds it on policypremium
 
-                                totalPremium += premium;
+                                totalPremium += premium; // adds the current premium of 1 vehicle into the total policy
+                                                         // premium
+
                                 addVehicle(brand, model, year, type, fuel, vehiclePrice, color, premium,
-                                        policyHolderNum); // calls method to insert it in a table
+                                        policyHolderID); // calls method to insert it in a table
+
                                 System.out.println("Vehicle added! Premium Charge: " + premium);
+                                go.pauseClear();
                             }
 
                         } catch (InputMismatchException e) {
@@ -142,11 +145,10 @@ public class Vehicle {
                         }
 
                     }
-                        policy.setPolicyPremium(totalPremium);
-                        policy.setPolicyHolderID(policyHolderNum); // adds vehicle premium in policy premium
-                    System.out.println("Finished adding vehicles!");
-                    System.out.println(policy.getPolicyHolderID());
-                    System.out.println(policy.getPolicyPremium());
+                    System.out.println("Finished adding vehicles! Total Premium: " + totalPremium);
+                    addPolicyPremium(totalPremium, policyID); // calls the method in order to update the policy table
+                                                              // and add the total premium
+                    setPolicyHolderPolicy(policyID, policyHolderID);
                     go.pauseClear();
                     break;
                 }
@@ -193,5 +195,41 @@ public class Vehicle {
         }
     }
 
+    public void addPolicyPremium(double policyPremium, int policyID) { // this method will add the total policy premium
+                                                                       // in policy table
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
+                Statement stmt = conn.createStatement();) {
+            stmt.executeUpdate(
+                    "UPDATE policy set policypremium = " + policyPremium + " WHERE policynumber = " + policyID + ""); // updates
+                                                                                                                      // the
+                                                                                                                      // policytable
+                                                                                                                      // so
+                                                                                                                      // we
+                                                                                                                      // can
+                                                                                                                      // store
+                                                                                                                      // the
+                                                                                                                      // totalPremium
+                                                                                                                      // into
+                                                                                                                      // it
+
+        } catch (SQLException e) { // handles errors
+            System.out.println("INVALID! " + e);
+        }
+
+    }
+
+    public void setPolicyHolderPolicy(int policyID, int policyHolderID) { // this method will update the policyholder,
+                                                                          // and adds the poilcynumber that corresponds
+                                                                          // to him/her
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
+                Statement stmt = conn.createStatement();) {
+            stmt.executeUpdate(
+                    "UPDATE policyholder set policy = " + policyID + " WHERE id = " + policyHolderID + "");
+
+        } catch (SQLException e) { // handles errors
+            System.out.println("INVALID! " + e);
+        }
+
+    }
 
 }
