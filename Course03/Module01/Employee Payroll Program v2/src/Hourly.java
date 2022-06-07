@@ -27,7 +27,6 @@ public class Hourly extends Employee {
                 else { //this will only run if no errors occured.
                     this.hourlyPay = hourlyPay;
                     this.hoursWorked = hoursWorked;
-                    sc.close();
                     break; //breaks the endless loop
                 }
 

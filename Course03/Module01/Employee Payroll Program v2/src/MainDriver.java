@@ -54,6 +54,7 @@ public class MainDriver {
             System.out.println(emp[x]);
             System.out.println("=================================");
         }
+        sc.close();
             break; //breaks the endless loop if user entered a value properly
            
         }
@@ -65,7 +66,6 @@ public class MainDriver {
         }
 
         }
-        sc.close();
 
 
     }
