@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -6,7 +7,7 @@ import java.util.Scanner;
 * @author Mike Lemuel Chan
 * @Description: Mysql connectivity, searching values from mysql table
 * @CreatedDate: 5/23/2022
-* @ModifiedDate: 5/25/2022
+* @ModifiedDate: 6/08/2022 fixed inputmismatchexception
 *
 */
 
@@ -22,6 +23,7 @@ public class UserPolicyProgram {
         boolean mainLoop = true;
 
         while (mainLoop) {
+            try {
             go.printBox("USER POLICY PROGRAM"); //prints a string with a border box
 
             System.out.print("[1] - View All Policy Details \n[2] - Show Policy Details " +
@@ -51,7 +53,12 @@ public class UserPolicyProgram {
 
             }
             go.PauseClear(); //pauses the console, then clears it after hitting the enter button
+        } catch (InputMismatchException e){
+            System.out.println("Invalid input! Try again.");
+            sc.nextLine();
+            go.PauseClear();
         }
+    }
         sc.close();
 
     }

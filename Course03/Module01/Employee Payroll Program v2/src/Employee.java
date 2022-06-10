@@ -7,12 +7,11 @@ public abstract class Employee {
     private String name, sss;
     private int birthMonth, birthWeek;
     int empNumber;
-    Scanner sc = new Scanner(System.in); //instantiated outside so child classes can use it
+    Scanner sc = new Scanner(System.in); // instantiated outside so child classes can use it
 
     public void load(int empNumber) {
         DisplayDesign go = new DisplayDesign(); // instantiation, its sole purpose is to print a string with box. It
         // can also pause and clear output.
-        
 
         String name, sss;
         int birthMonth, birthWeek;
@@ -20,19 +19,20 @@ public abstract class Employee {
 
         while (true) {
 
-            try  {
+            try {
                 System.out.print("Name: ");
                 name = sc.next();
-                name += sc.nextLine(); //if user input has spaces, the next value will add in the variable
+                name += sc.nextLine(); // if user input has spaces, the next value will add in the variable
 
                 System.out.print("SSS: ");
                 sss = sc.next();
-                sss += sc.nextLine(); //prevents reading ahead if ever the user puts a string with spaces
+                sss += sc.nextLine(); // prevents reading ahead if ever the user puts a string with spaces
 
                 System.out.print("Birthday Month [1-12]: ");
                 birthMonth = sc.nextInt();
 
-                System.out.print("Birthday Week [1-5]: "); //instead of 1-4, the calendar detects a week 5, so I made it 1-5
+                System.out.print("Birthday Week [1-5]: "); // instead of 1-4, the calendar detects a week 5, so I made
+                                                           // it 1-5
                 birthWeek = sc.nextInt();
 
                 if (birthMonth > 12 || birthWeek > 5 || birthMonth < 1 || birthWeek < 1) { // if birthMonth / birthweek
@@ -73,18 +73,22 @@ public abstract class Employee {
 
     public double getBonus() {
         Calendar calendar = Calendar.getInstance(Locale.US);
-        double bonus = 100;
-        int currentMonth = calendar.get(Calendar.MONTH) +1; // gets the month number, +1 because the java starts with 0 in january
+        double bonus = 100, paycheck = getEarnings();
+        final double maxPayCheck = 1000;
+
+        int currentMonth = calendar.get(Calendar.MONTH) + 1; // gets the month number, +1 because the java starts with 0
+                                                             // in january
         int currentWeek = calendar.get(Calendar.WEEK_OF_MONTH); // gets the week of month's number
 
         if (this.birthMonth == currentMonth && this.birthWeek == currentWeek) { // compares given birthday if it matches
-            return getEarnings() + bonus; // to the current date
+            paycheck += bonus; // to the current date
         }
 
-        else { // if it's not his/her birthday, then it will return the paycheck without
-               // modifying the value
-            }
-            return getEarnings();
+        if (paycheck > maxPayCheck){ //if earnings exceeds 1000, then we will return a 1000 value
+            paycheck = maxPayCheck;
+        }
+
+        return paycheck;
 
     }
 

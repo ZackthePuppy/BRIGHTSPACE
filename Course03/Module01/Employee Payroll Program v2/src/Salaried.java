@@ -1,11 +1,12 @@
 import java.util.InputMismatchException;
 
-public class Salaried extends Hourly{
+public class Salaried extends Employee{
     private double weeklySalary;
 
     public void load(int empNumber) {
         DisplayDesign go = new DisplayDesign();
         double weeklySalary;
+
         super.load(empNumber);
 
         while (true){

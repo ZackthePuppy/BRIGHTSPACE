@@ -234,7 +234,6 @@ public class PolicyHolder extends Policy {
             System.out.println(e);
         }
         return 0;
-
     }
 
     public int getYearIssued(int searchAcc) { // this method will get the date issued year from a policyholder
@@ -252,7 +251,6 @@ public class PolicyHolder extends Policy {
             System.out.println(e);
         }
         return 0;
-
     }
 
 }

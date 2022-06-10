@@ -5,7 +5,7 @@ public class MySQLProcess {
     //initialization for mysql used for connection later
 
     private String dbURL = "jdbc:mysql://localhost:3306/";
-    private String dbName = "sampleejava";
+    private String dbName = "sampleejava"; //NAME OF MY DATABASE, you can freely change it
     private final String USER = "root";
     private final String PASS = "";
 
