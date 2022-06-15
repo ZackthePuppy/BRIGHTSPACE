@@ -1,16 +1,10 @@
 import java.sql.*;
 import java.util.*;
 
-public class Policy {
+public class Policy extends DatabaseConnection {
     private Scanner sc = new Scanner(System.in);
     private Calendar calendar = Calendar.getInstance();
     private DisplayDesign go = new DisplayDesign();
-
-
-    DatabaseConnection db = new DatabaseConnection();
-    private Connection conn;
-    private Statement stmt;
-    private PreparedStatement preparedStmt;
 
     public void createPolicy() {
         calendar = Calendar.getInstance();
@@ -39,13 +33,14 @@ public class Policy {
                         System.out.print("Day [1-31]: ");
                         day = sc.nextInt();
 
-                        System.out.print("Year [" + calendar.get(Calendar.YEAR) + " onwards]: ");
+                        System.out.print("Year [" + calendar.get(Calendar.YEAR) + " onwards, 4 digits]: ");
                         year = sc.nextInt();
 
-                        if ((month > 12 && month <= 0) || (day > 31 && day <= 0)) { // if user puts incorrect date
+                        if ((month > 12 && month <= 0) || (day > 31 && day <= 0) || String.valueOf(year).length() > 4) { // if user puts incorrect date
                             System.out.println("INVALID input! Please follow instructions.");
                             go.pauseClear();
                         }
+
 
                         else {
 
@@ -150,43 +145,162 @@ public class Policy {
     }
 
     public void cancelPolicy() {
-        int choosePolicyID;
+        int policyID;
         boolean policyIDExist;
+        String choice, delConfirm;
+        int newExpYear, newExpMonth, newExpDay;
 
-        try {
+        go.clearConsole();
         go.printBox("CANCEL A POLICY");
-        System.out.print("Enter policy #: ");
-        choosePolicyID = sc.nextInt();
-
-        policyIDExist = searchPolicyID(choosePolicyID);
-
-        if (policyIDExist){
-
-        }
-
-        else {
-            System.out.print("No policy found");
-        }
-        
-    } catch (InputMismatchException e){
-        System.out.println("INVALID! Please try again.");
-        sc.nextLine();
-        go.pauseClear();
-    }
-
-    }
-
-    public boolean searchPolicyID (int policyID){
-        db.connect();
         try {
+            System.out.print("Enter policy #: ");
+            policyID = sc.nextInt();
 
-        String query = "INSERT into policy (effectdate, expiredate, policyowner) VALUES (?, ?, ?)";
-        preparedStmt = conn.prepareStatement(query);
-    } catch (SQLException e){
-        System.out.println(e);
-        return false;
+            policyIDExist = searchPolicyID(policyID);
+
+            if (policyIDExist == true) {
+                System.out.print(
+                        "[1] - Remove/Delete policy \n[2] - Change expiration date to an earlier date \n\nChoose: ");
+                choice = sc.next();
+                choice += sc.nextLine();
+
+                switch (choice) {
+                    case "1":
+                        System.out.print(
+                                "Are you sure to remove policy #" + policyID + "? [1] - Yes / [Any] - No: "); // confirmation
+                                                                                                              // before
+                                                                                                              // deleting
+                                                                                                              // from
+                                                                                                              // table
+                        delConfirm = sc.nextLine();
+                        if (delConfirm.equals("1")) {
+                            removePolicy(policyID);
+                        } else {
+                            System.out.println("Removal of policy #" + policyID + " has been cancelled.");
+                        }
+                        break;
+
+                    case "2":
+                    System.out.println("Current Expiry Date: " + showCurrentExpiryDate(policyID));
+                    System.out.print("Month [1-12]: ");
+                    newExpMonth = sc.nextInt();
+                    System.out.print("Day: [1-31]: ");
+                    newExpDay = sc.nextInt();
+                    System.out.print("Year [4 digits]: ");
+                    newExpYear = sc.nextInt();
+
+                    if ((newExpMonth > 12 && newExpMonth <= 0) || (newExpDay > 31 && newExpDay <= 0) 
+                    || String.valueOf(newExpYear).length() > 4) { // if user puts incorrect date
+                        System.out.println("INVALID input! Please follow instructions, try again later.");
+                    }
+
+                    else {
+                        changeExpiryDate(newExpMonth, newExpDay, newExpYear, policyID);
+                    }
+
+                        break;
+
+                    default:
+                        System.out.println("INVALID choice! Try again.");
+                        break;
+                }
+            }
+
+            else {
+                System.out.print("No policy found.");
+            }
+
+        } catch (InputMismatchException e) {
+            System.out.println("INVALID! Please try again.");
+            sc.nextLine();
+            go.pauseClear();
+        }
+
     }
 
-}
+    public boolean searchPolicyID(int policyID) {
+        dbConnect();
+        try {
+            rs = stmt.executeQuery("SELECT policynumber from policy WHERE policynumber = " + policyID);
+            // number from query
+
+            if (!rs.isBeforeFirst()) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    public void removePolicy(int policyID) {
+        dbConnect();
+        try {
+            int result = stmt.executeUpdate("DELETE from policy where policynumber = " + policyID);
+
+            if (result == 0) { // executes if the table didn't have any change, and the row results returned 0
+                System.out.println("Removal of policy #" + policyID + " has failed. Try again later.");
+            } else {
+                System.out.println("Cancellation of policy #" + policyID + " is complete!");
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+    public String showCurrentExpiryDate (int policyID) {
+        dbConnect();
+        try {
+            rs = stmt.executeQuery("SELECT expiredate from policy where policynumber = " + policyID);
+            // number from query
+
+            if (!rs.next()) {
+                return "No Date";
+            } else {
+                return rs.getString(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+            return "No Date";
+        }
+    }
+
+    public void changeExpiryDate (int newExpMonth, int newExpDay, int newExpYear, int policyID) {
+        dbConnect();
+        try {
+            rs = stmt.executeQuery("SELECT MONTH (effectdate), DAY (effectdate), YEAR (effectdate)," +
+            " MONTH (expiredate), DAY (expiredate), YEAR (expiredate) from policy WHERE policynumber = " + policyID);
+
+            while (rs.next()){
+                int effectMonth = rs.getInt(1);
+                int effectDay = rs.getInt(2);
+                int effectYear = rs.getInt(3);
+                int oldExpMonth = rs.getInt(4);
+                int oldExpDay = rs.getInt(5);
+                int oldExpYear = rs.getInt(6);
+
+                if ( (newExpMonth < effectMonth) || (newExpDay < effectDay) || (newExpYear < effectYear) ){
+                    System.out.println("INVALID! New expiry date must be greater than the effective date. \nTry again later.");
+                }
+                else if ( (newExpMonth > oldExpMonth) || (newExpDay > oldExpDay) || (newExpYear > oldExpYear) ){
+                    System.out.println("INVALID! You cannot extend the current expiry date! \nTry again later.");
+                }
+                else {
+                    preparedStmt = conn.prepareStatement("UPDATE policy set expiredate = ? where policynumber = ?");
+                    preparedStmt.setString(1, newExpYear + "-" + newExpMonth + "-" + newExpDay);
+                    preparedStmt.setInt(2, policyID);
+                    preparedStmt.execute();
+                    System.out.println("Sucessfully cancelled policy! New expiry date: " 
+                    + newExpYear + "-" + newExpMonth + "-" + newExpDay);
+                }
+            }
+
+        } catch (SQLException e){
+            System.out.println(e);
+        }
+    }
 
 }

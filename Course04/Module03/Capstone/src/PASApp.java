@@ -10,11 +10,13 @@ public class PASApp {
         CustomerAccount createAcc = new CustomerAccount();
         AccidentClaim claim = new AccidentClaim();
         Policy policy = new Policy();
+        DatabaseConnection db = new DatabaseConnection();
         String choice;
         boolean mainLoop = true;
 
         while (mainLoop) {
 
+            db.checkPolicyStatus(); //updates the status of policy everytime the loop continues
             go.printBox("AUTOMOBILE INSURANCE | " + calendar.getTime());
             System.out.println("[1] - Create new Customer Account \n[2] - Get Policy Quote & Buy the Policy" +
                     "\n[3] - Cancel Specific Policy \n[4] - File an Accident Claim" +
@@ -33,10 +35,11 @@ public class PASApp {
                     break;
 
                 case "3":
+                    policy.cancelPolicy();
                     break;
 
-                case "4":
-                claim.createClaim();
+                case "4": // creates an accident claim in specific policy
+                    claim.createClaim();
                     break;
 
                 case "5":

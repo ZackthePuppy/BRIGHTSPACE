@@ -1,7 +1,7 @@
 import java.sql.*;
 import java.util.Scanner;
 
-public class CustomerAccount {
+public class CustomerAccount extends DatabaseConnection{
     private Scanner sc = new Scanner(System.in);
 
     public void createAccount() {
@@ -32,14 +32,12 @@ public class CustomerAccount {
 
     public void processQuery(String firstname, String lastname, String address) { // method for processing the query in
                                                                                   // mysql
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
-
+        try {
             String query = ("INSERT INTO customer (firstname, lastname, address) VALUES (?, ?, ?)"); // executes a query
                                                                                                      // based on the
                                                                                                      // given value in
                                                                                                      // the parameter
-            PreparedStatement preparedStmt = conn.prepareStatement(query); // used preparedStatement to prevent sql
+            preparedStmt = conn.prepareStatement(query); // used preparedStatement to prevent sql
                                                                            // injection
             preparedStmt.setString(1, firstname);
             preparedStmt.setString(2, lastname);
@@ -47,7 +45,7 @@ public class CustomerAccount {
 
             preparedStmt.execute(); // finally executes the query
 
-            ResultSet rs = stmt.executeQuery("SELECT MAX(id) from customer"); // gets the recently added id in the table
+            rs = stmt.executeQuery("SELECT MAX(id) from customer"); // gets the recently added id in the table
 
             while (rs.next()) {
                 System.out.println("Successfully created account with an account number of " + rs.getInt(1)); // prints

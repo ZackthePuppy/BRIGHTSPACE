@@ -149,7 +149,6 @@ public class Vehicle {
                     addPolicyPremium(totalPremium, policyID); // calls the method in order to update the policy table
                                                               // and add the total premium
                     setPolicyHolderPolicy(policyID, policyHolderID);
-                    go.pauseClear();
                     break;
                 }
 
