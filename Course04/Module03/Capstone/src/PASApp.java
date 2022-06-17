@@ -7,7 +7,7 @@ public class PASApp {
                                                 // of output
         Scanner sc = new Scanner(System.in);
         Calendar calendar = Calendar.getInstance();
-        CustomerAccount createAcc = new CustomerAccount();
+        CustomerAccount customer = new CustomerAccount();
         AccidentClaim claim = new AccidentClaim();
         Policy policy = new Policy();
         DatabaseConnection db = new DatabaseConnection();
@@ -27,7 +27,7 @@ public class PASApp {
 
             switch (choice) {
                 case "1":
-                    createAcc.createAccount(); // calls the createaccount method under customeraccount class
+                customer.createAccount(); // calls the createaccount method under customeraccount class
                     break;
 
                 case "2":
@@ -43,6 +43,7 @@ public class PASApp {
                     break;
 
                 case "5":
+                customer.searchAccount();
                     break;
 
                 case "6":

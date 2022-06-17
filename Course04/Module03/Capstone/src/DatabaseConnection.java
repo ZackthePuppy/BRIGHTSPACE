@@ -5,7 +5,7 @@ public class DatabaseConnection {
     Connection conn;
     Statement stmt;
     PreparedStatement preparedStmt;
-    ResultSet rs;
+    ResultSet rs, rs2;
 
     public DatabaseConnection dbConnect() { //for connecting to the database
         try {
@@ -32,4 +32,6 @@ public class DatabaseConnection {
             System.out.println(e);
         }
     }
+
+
 }

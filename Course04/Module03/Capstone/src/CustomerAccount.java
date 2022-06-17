@@ -3,9 +3,10 @@ import java.util.Scanner;
 
 public class CustomerAccount extends DatabaseConnection{
     private Scanner sc = new Scanner(System.in);
+    DisplayDesign go = new DisplayDesign();
+    Validation valid = new Validation();
 
     public void createAccount() {
-        DisplayDesign go = new DisplayDesign();
         String firstname, lastname, address;
         go.clearConsole(); // clears the terminal
 
@@ -32,6 +33,7 @@ public class CustomerAccount extends DatabaseConnection{
 
     public void processQuery(String firstname, String lastname, String address) { // method for processing the query in
                                                                                   // mysql
+        dbConnect();
         try {
             String query = ("INSERT INTO customer (firstname, lastname, address) VALUES (?, ?, ?)"); // executes a query
                                                                                                      // based on the
@@ -58,7 +60,59 @@ public class CustomerAccount extends DatabaseConnection{
             System.out.println("INVALID! " + e);
             System.out.println("Please try again later!");
         }
+    }
 
+    public void searchAccount () {
+        String firstName = "", lastName = "";
+        boolean validated = false;
+
+        while (!validated) {
+        go.printBox("SEARCH CUSTOMER ACCOUNT");
+
+        System.out.print("Firstname: ");
+        firstName = sc.next();
+        firstName += sc.nextLine();
+
+        System.out.print("Lastname: ");
+        lastName = sc.nextLine();
+
+        validated = valid.name(firstName, lastName);
+        }
+
+        if (validated == false){
+            System.out.println("No customer found.");
+        }
+        
+        else {
+            viewAccount(firstName, lastName); //executes the query to show the tables
+        }
+    }
+
+    public void viewAccount (String firstName, String lastName) {
+        dbConnect();
+        int policyID = 0;
+        try{
+            rs = stmt.executeQuery("SELECT * FROM customer WHERE firstname = '" + firstName
+             + "' and lastname = '" + lastName + "'");
+             
+             while (rs.next()){
+                 policyID = rs.getInt(1);
+                 go.printBox("CUSTOMER INFORMATION || NUMBER: " + policyID);
+                 System.out.println("Name: " + rs.getString(2) + " " + rs.getString(3));
+                 System.out.println("Address: " + rs.getString(4));
+                }
+                
+                
+            rs2 = stmt.executeQuery("SELECT policynumber, status from policy where policyowner = " + policyID);
+            while (rs2.next()){
+                go.printBox("LIST OF POLICIES OWNED");
+                System.out.printf("%-15s %10s", "POLICY NUMBER", "STATUS");
+                System.out.printf("%-15s %10s", rs.getInt(1), rs.getString(2));
+                System.out.println();
+            }
+        } catch (SQLException e){
+            System.out.println(e);
+        }
     }
 
 }
