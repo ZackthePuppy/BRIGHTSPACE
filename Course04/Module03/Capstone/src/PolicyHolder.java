@@ -3,16 +3,17 @@ import java.util.Calendar;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class PolicyHolder extends Policy {
+public class PolicyHolder extends DatabaseConnection {
     Scanner sc = new Scanner(System.in);
     DisplayDesign go = new DisplayDesign();
     Calendar calendar = Calendar.getInstance();
     Vehicle vehicle = new Vehicle();
+    Validation valid = new Validation();
 
     public void policyHolder(int accNum, int policyID) {
         go.clearConsole();
         String choice;
-        boolean mainLoop = true, hasPolicyHolder;
+        boolean mainLoop = true;
         int policyNum, searchAcc, driverYear;
 
         while (mainLoop) { // endless loop unless input was satisfied
@@ -29,14 +30,14 @@ public class PolicyHolder extends Policy {
                 case "2":
                     try {
                         go.printBox("List of Policy Holders in Account #" + accNum);
-                        hasPolicyHolder = listOfHolders(accNum);
 
-                        if (hasPolicyHolder == true) { // proceed if there is exisiting policyholders
+                        if (listOfHolders(accNum) == true) { // proceed if there is exisiting policyholders
                             System.out.print("Select Policy Holder ID: ");
                             searchAcc = sc.nextInt();
 
-                            policyNum = searchAccount(searchAcc); // calls the method, then stores the return value in a
-                                                                  // variable
+                            policyNum = valid.searchAccount(searchAcc); // calls the method, then stores the return
+                                                                        // value in a
+                            // variable
                             driverYear = getYearIssued(searchAcc); // gets the num of years since driver license was
                                                                    // first
                                                                    // issued
@@ -76,19 +77,20 @@ public class PolicyHolder extends Policy {
 
     public void addPolicyHolder(int accNum) { // method for adding policy holder in specific customer acc
                                               // num
-        String firstname, lastname, birthDate, address, licenseNum;
+        String firstName, lastName, birthDate, address, licenseNum;
         int licenseDay, licenseMonth, licenseYear;
+        boolean policyHolderLoop = true;
 
-        while (true) {
+        while (policyHolderLoop) {
             go.printBox("ADD NEW POLICY HOLDER FOR ACC #" + accNum);
             System.out.print("Firstname: ");
-            firstname = sc.next();
-            firstname += sc.nextLine();
+            firstName = sc.next();
+            firstName += sc.nextLine();
 
             System.out.print("Lastname: ");
-            lastname = sc.nextLine();
+            lastName = sc.nextLine();
 
-            System.out.print("Date of Birth: ");
+            System.out.print("Date of Birth: [YYYY-MM-DD]: ");
             birthDate = sc.nextLine();
 
             System.out.print("Address: ");
@@ -97,68 +99,56 @@ public class PolicyHolder extends Policy {
             System.out.print("License Number: ");
             licenseNum = sc.nextLine();
 
-            if (firstname.isBlank() || lastname.isBlank() || birthDate.isBlank() || address.isBlank()
-                    || licenseNum.isBlank()) { // validation if there are no inputs
-                System.out.println("INVALID! Please don't leave it blank!");
-                go.pauseClear();
-            }
+            if ((valid.policyHolderName(firstName, lastName, birthDate, address, licenseNum) == true)
+                    && (valid.licenseNumCheck(licenseNum) == true)) {
+                policyHolderLoop = false;
+                while (true) {
+                    try {
+                        go.printBox("Driver's License Date Issued");
+                        System.out.print("Month [1-12]: ");
+                        licenseMonth = sc.nextInt() - 1;
 
-            else {
-                try {
-                    go.printBox("Driver's License Date Issued");
-                    System.out.print("Month [1-12]: ");
-                    licenseMonth = sc.nextInt() - 1;
+                        System.out.print("Day [1-31]: ");
+                        licenseDay = sc.nextInt();
 
-                    System.out.print("Day [1-31]: ");
-                    licenseDay = sc.nextInt();
+                        System.out.print("Year: ");
+                        licenseYear = sc.nextInt();
 
-                    System.out.print("Year: ");
-                    licenseYear = sc.nextInt();
+                        if (valid.licenseCheck(licenseYear, licenseMonth, licenseDay) == true) {
+                            policyHolderQuery(firstName, lastName, birthDate, address, licenseNum, licenseDay,
+                                    licenseMonth,
+                                    licenseYear, accNum); // sends all the values in another method so that it can
+                                                          // be
+                                                          // inserted on tables
+                            break; // breaks the endless loop because the input was satisfied and passes it in
+                                   // parameter
+                        }
 
-                    if ((licenseMonth < 1 && licenseMonth > 12) && (licenseDay < 1 && licenseDay > 31)) { // validation
-                                                                                                          // of
-                                                                                                          // date
-                        System.out.println("Month or Day is INVALID!");
+                    } catch (InputMismatchException e) {
+                        System.out.println("INVALID input!");
+                        sc.nextLine();
                         go.pauseClear();
                     }
-
-                    else if (String.valueOf(licenseYear).length() != 4) { // if year is not 4 digit
-                        System.out.println("INVALID! Year must be 4 digits.");
-                        go.pauseClear();
-                    }
-
-                    else {
-                        policyHolderQuery(firstname, lastname, birthDate, address, licenseNum, licenseDay, licenseMonth,
-                                licenseYear, accNum); // sends all the values in another method so that it can be
-                                                      // inserted on tables
-                        break; // breaks the endless loop because the input was satisfied and passes it in
-                               // parameter
-                    }
-
-                } catch (InputMismatchException e) {
-                    System.out.println("INVALID input!");
-                    sc.nextLine();
-                    go.pauseClear();
                 }
             }
         }
 
     }
 
-    public void policyHolderQuery(String firstname, String lastname, String birthDate, String address,
-            String licenseNum, int licenseDay, int licenseMonth, int licenseYear, int accNum) { // for inserting
-                                                                                                // PolicyHolder values
-                                                                                                // into the table
+    public void policyHolderQuery(String firstname, String lastname,
+            String birthDate, String address,
+            String licenseNum, int licenseDay,
+            int licenseMonth, int licenseYear,
+            int accNum) { // for inserting PolicyHolder values into the table
+        dbConnect();
+        try {
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
+            String query = ("INSERT INTO policyholder (firstname, lastname, birthdate, address, licensenumber," +
+                    " licensedate, policyowner) VALUES (?, ?, ?, ?, ?, ?, ?)"); // executes a query based on the given
+                                                                                // value in the parameter
 
-            String query = ("INSERT INTO policyholder (firstname, lastname, birthdate, licensenumber," +
-                    " licensedate, policyowner) VALUES (?, ?, ?, ?, ?, ?)"); // executes a query based on the given
-                                                                             // value in the parameter
-
-            PreparedStatement preparedStmt = conn.prepareStatement(query); // used preparedStatement to prevent sql
-                                                                           // injection
+            preparedStmt = conn.prepareStatement(query); // used preparedStatement to prevent sql
+                                                         // injection
 
             calendar.set(licenseYear, licenseMonth, licenseDay);
             java.util.Date dateUtil = calendar.getTime();
@@ -167,25 +157,23 @@ public class PolicyHolder extends Policy {
             preparedStmt.setString(1, firstname);
             preparedStmt.setString(2, lastname);
             preparedStmt.setString(3, birthDate);
-            preparedStmt.setString(4, licenseNum);
-            preparedStmt.setDate(5, date);
-            preparedStmt.setInt(6, accNum);
+            preparedStmt.setString(4, address);
+            preparedStmt.setString(5, licenseNum);
+            preparedStmt.setDate(6, date);
+            preparedStmt.setInt(7, accNum);
 
             preparedStmt.execute(); // finally executes the query
 
-            ResultSet rs = stmt.executeQuery("select firstname, lastname " +
+            rs = stmt.executeQuery("select firstname, lastname " +
                     " from policyholder where id = (select MAX(id) from policyholder)"); // gets the recently added id
                                                                                          // in the table
-
             while (rs.next()) {
-                System.out.println("Success! Policy Holder Name: " + rs.getString(1) + " " + rs.getString(2)); // prints
-                                                                                                               // the
-                                                                                                               // account
-                                                                                                               // number
+                System.out.println("Success! Policy Holder Name: "
+                        + rs.getString(1) + " " + rs.getString(2)); // prints the account number
             }
 
         } catch (SQLException e) { // handles errors
-            System.out.println("INVALID! " + e);
+            System.out.println("INVALID! " + e.getMessage());
             System.out.println("Please try again later!");
         }
     }
@@ -193,16 +181,17 @@ public class PolicyHolder extends Policy {
     public boolean listOfHolders(int accNum) { // displays list of policyholders under specific acc that doesn't have
                                                // any
                                                // policies yet
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
-            String query = "select id, firstname, lastname from policyholder where policyowner = "
-                    + accNum + " and policy is NULL";
-            ResultSet rs = stmt.executeQuery(query);
+        dbConnect();
+        try {
+            rs = stmt.executeQuery("select id, firstname, lastname from policyholder where policyowner = "
+                    + accNum + " and policy is NULL");
 
             if (!rs.isBeforeFirst()) {
                 System.out.println("NO Policy Holders in this Account!");
                 return false;
-            } else {
+            }
+
+            else {
                 System.out.printf("%-5s %-15s %15s\n", "ID#", "FIRSTNAME", "LASTNAME");
                 while (rs.next()) { // PRINTS the lists of policy holders
                     System.out.printf("%-5s %-15s %15s\n", rs.getString(1), rs.getString(2), rs.getString(3));
@@ -211,46 +200,32 @@ public class PolicyHolder extends Policy {
             }
 
         } catch (SQLException e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    public int searchAccount(int searchAcc) { // this method will search the id of policy holder
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
+    public int getYearIssued(int searchAcc) { // this method will get and calculate the dlx
+        dbConnect();
+        try {
+            int year;
+            rs = stmt.executeQuery("select YEAR(licensedate) from policyholder" +
+                    " where id = " + searchAcc + " and policy is NULL"); // search the account number from query
 
-            ResultSet rs = stmt
-                    .executeQuery("SELECT id from policyholder WHERE id = " + searchAcc + " and policy is NULL"); // search
-                                                                                                                  // the
-                                                                                                                  // account
-            // number from query
-
-            if (rs.next() == true) {
-                return rs.getInt(1);
+            while (rs.next()) {
+                year = ((calendar.get(Calendar.YEAR)) - (rs.getInt(1)));
+                if (year < 1) {
+                    return 1;
+                } else {
+                    return year;
+                }
             }
 
         } catch (SQLException e) { // handles errors
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
-        return 0;
-    }
+        return 1;
 
-    public int getYearIssued(int searchAcc) { // this method will get the date issued year from a policyholder
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
-            ResultSet rs = stmt.executeQuery("select YEAR(licensedate) from policyholder" +
-                    " where id = " + searchAcc + " and policy is NULL"); // search the account
-                                                                         // number from query
-
-            if (rs.next() == true) {
-                return (calendar.get(Calendar.YEAR) - rs.getInt(1));
-            }
-
-        } catch (SQLException e) { // handles errors
-            System.out.println(e);
-        }
-        return 0;
     }
 
 }

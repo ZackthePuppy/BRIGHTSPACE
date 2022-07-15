@@ -1,30 +1,29 @@
 import java.sql.*;
+import java.util.Calendar;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Vehicle {
+public class Vehicle extends DatabaseConnection {
     Scanner sc = new Scanner(System.in);
 
     public void policyHolderVehicle(int policyHolderID, int accNum, int driverYear, int policyID) {
         RatingEngine ratingEngine = new RatingEngine();
         DisplayDesign go = new DisplayDesign();
+        Validation valid = new Validation();
+        Calendar calendar = Calendar.getInstance();
+
         int vehicleNum, year;
-        double vehiclePrice, vehiclePriceFactor = 0, premium, totalPremium = 0;
+        double vehiclePrice, premium, totalPremium = 0;
         String brand, model, type, fuel, color;
         go.clearConsole();
 
         while (true) {
             try {
-                go.printBox("Policy Holder ID#" + policyHolderID + " | Account #" + accNum);
+                go.printBox("Policy Holder ID #" + policyHolderID + " | Account #" + accNum);
                 System.out.print("Number of Vehicle: ");
                 vehicleNum = sc.nextInt();
 
-                if (vehicleNum <= 0) {
-                    System.out.println("INVALID! Input cannot be zero/negative!");
-                    go.pauseClear();
-                }
-
-                else {
+                if (valid.vehicleCount(vehicleNum) == true) {
                     for (int x = 1; x <= vehicleNum; x++) {
                         try {
                             go.printBox("Vehicle #" + x);
@@ -36,24 +35,8 @@ public class Vehicle {
                             System.out.print("Model: ");
                             model = sc.nextLine();
 
-                            System.out.print("Year: ");
-                            year = sc.nextInt();
-
-                            if (year <= 1) {
-                                vehiclePriceFactor = 1.0;
-                            } else if (year <= 3) {
-                                vehiclePriceFactor = 0.8;
-                            } else if (year <= 5) {
-                                vehiclePriceFactor = 0.7;
-                            } else if (year <= 10) {
-                                vehiclePriceFactor = 0.6;
-                            } else if (year <= 15) {
-                                vehiclePriceFactor = 0.4;
-                            } else if (year <= 20) {
-                                vehiclePriceFactor = 0.2;
-                            } else if (year <= 40) {
-                                vehiclePriceFactor = 0.1;
-                            }
+                            System.out.print("Year Bought: ");
+                            year = (calendar.get(Calendar.YEAR)) - sc.nextInt();
 
                             while (true) { // endless loop if user didnt choose correct vehicle type
                                 System.out.print(
@@ -112,7 +95,7 @@ public class Vehicle {
                             }
 
                             else if (year > 40) {
-                                System.out.println("Vehicle with more than 40 years old is not eligible!");
+                                System.out.println("Vehicle with the age of more than 40 years old is not eligible!");
                                 x--;
                                 go.pauseClear();
                             }
@@ -123,7 +106,10 @@ public class Vehicle {
                             }
 
                             else { // finally runs/adds the values when there is no errors
-                                premium = ratingEngine.engine(vehiclePrice, vehiclePriceFactor,
+                                System.out.println("Vehicle Price: " + vehiclePrice);
+                                System.out.println("Year : " + year);
+                                System.out.println("License Year: " + driverYear);
+                                premium = ratingEngine.calculate(vehiclePrice, year,
                                         driverYear); // calls the rating engine class, then it calculates the premium
                                                      // charge, and adds it on policypremium
 
@@ -133,12 +119,13 @@ public class Vehicle {
                                 addVehicle(brand, model, year, type, fuel, vehiclePrice, color, premium,
                                         policyHolderID); // calls method to insert it in a table
 
-                                System.out.println("Vehicle added! Premium Charge: " + premium);
+                                System.out.println("Vehicle #" + x + " added! Premium Charge: " + premium);
                                 go.pauseClear();
                             }
 
                         } catch (InputMismatchException e) {
                             System.out.println("INVALID input!");
+                            sc.nextLine();
                             go.pauseClear();
                             x--; // prevents incrementing the loop, so it will stay in current vehicle if user
                                  // typed wrong input
@@ -164,19 +151,17 @@ public class Vehicle {
 
     public void addVehicle(String brand, String model, int year, String type, String fuel, double price, String color,
             double premiumcharge, int policyHolderNum) { // this method will add the vehicle to the table
+        dbConnect();
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
+        try {
 
-            String query = ("INSERT into vehicle (brand, model, year, type, fuel, " +
-                    "price, color, premiumcharge, policyholder) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"); // executes a
-                                                                                                      // query based on
-                                                                                                      // the given
-            // value in the parameter
+            String query = ("INSERT into vehicle (brand, model, year, type, fuel, "
+                    + "price, color, premiumcharge, policyholder)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"); // executes a query based on the given value in the
+                                                              // parameter
 
             PreparedStatement preparedStmt = conn.prepareStatement(query); // used preparedStatement to prevent sql
                                                                            // injection
-
             preparedStmt.setString(1, brand);
             preparedStmt.setString(2, model);
             preparedStmt.setInt(3, year);
@@ -186,7 +171,6 @@ public class Vehicle {
             preparedStmt.setString(7, color);
             preparedStmt.setDouble(8, premiumcharge);
             preparedStmt.setInt(9, policyHolderNum);
-
             preparedStmt.execute(); // finally executes the query
 
         } catch (SQLException e) { // handles errors
@@ -196,20 +180,15 @@ public class Vehicle {
 
     public void addPolicyPremium(double policyPremium, int policyID) { // this method will add the total policy premium
                                                                        // in policy table
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
+        dbConnect();
+
+        try {
+
             stmt.executeUpdate(
-                    "UPDATE policy set policypremium = " + policyPremium + " WHERE policynumber = " + policyID + ""); // updates
-                                                                                                                      // the
-                                                                                                                      // policytable
-                                                                                                                      // so
-                                                                                                                      // we
-                                                                                                                      // can
-                                                                                                                      // store
-                                                                                                                      // the
-                                                                                                                      // totalPremium
-                                                                                                                      // into
-                                                                                                                      // it
+                    "UPDATE policy set policypremium = "
+                            + policyPremium
+                            + " WHERE policynumber = "
+                            + policyID + ""); // updates the policytable so we can store the totalPremium into it
 
         } catch (SQLException e) { // handles errors
             System.out.println("INVALID! " + e);
@@ -220,8 +199,8 @@ public class Vehicle {
     public void setPolicyHolderPolicy(int policyID, int policyHolderID) { // this method will update the policyholder,
                                                                           // and adds the poilcynumber that corresponds
                                                                           // to him/her
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/pas", "root", "");
-                Statement stmt = conn.createStatement();) {
+        dbConnect();
+        try {
             stmt.executeUpdate(
                     "UPDATE policyholder set policy = " + policyID + " WHERE id = " + policyHolderID + "");
 
