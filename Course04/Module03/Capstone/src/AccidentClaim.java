@@ -2,7 +2,6 @@ import java.sql.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import com.mysql.cj.xdevapi.DatabaseObject.DbObjectStatus;
 
 public class AccidentClaim extends DatabaseConnection{
     Scanner sc = new Scanner(System.in);
@@ -88,7 +87,7 @@ public class AccidentClaim extends DatabaseConnection{
     }
 
 
-
+    //this method will insert values to accident table (the claims) if there was no error in the process
     public void processClaim (String accidentDate, String accidentAddress, String accidentDesc, String damageDesc, double repairCost, int policyID){
         dbConnect();
         try {
@@ -122,7 +121,7 @@ public class AccidentClaim extends DatabaseConnection{
         }
     }
 
-    public String effectiveDate (int policyID){
+    public String effectiveDate (int policyID){//returns effective date from a query and will be used for printing effective date
         dbConnect();
         String effectDate = "";
         try {
@@ -137,7 +136,7 @@ public class AccidentClaim extends DatabaseConnection{
         return effectDate;
     }
 
-    public String expireDate (int policyID){
+    public String expireDate (int policyID){ //for expiry date
         dbConnect();
         String expireDate = "";
         try {
@@ -152,7 +151,7 @@ public class AccidentClaim extends DatabaseConnection{
         return expireDate;
     }
 
-    public void showClaim (int policyID){
+    public void showClaim (int policyID){ //for OPTION #7
 
     }
 

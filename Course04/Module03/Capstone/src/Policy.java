@@ -1,5 +1,4 @@
 import java.sql.*;
-import java.text.NumberFormat;
 import java.util.*;
 
 public class Policy extends DatabaseConnection {
