@@ -103,14 +103,16 @@ public class DatabaseConnection { //this class is all about connecting to databa
         } 
         finally {
             try {
-            if (rs != null) {
-                    rs.isBeforeFirst();
-            }
-            if (rs2 != null) {
-                    rs2.isBeforeFirst();
-            }
-            if (rs3 != null) {
-                    rs3.isBeforeFirst();
+                if (rs != null && rs2 != null && rs3 != null ){
+                if (rs.next()) {
+                        rs.isBeforeFirst();
+                }
+                if (rs2.next()) {
+                        rs2.isBeforeFirst();
+                }
+                if (rs3.next()) {
+                        rs3.isBeforeFirst();
+                }
             }
         } catch (SQLException e){
             System.out.println(e.getMessage());
