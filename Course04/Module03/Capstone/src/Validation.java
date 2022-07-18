@@ -36,31 +36,41 @@ public class Validation extends DatabaseConnection {
     }
 
     public boolean customerAccount(String firstName, String lastName, String address) { //validates the customer's info
-
+        dbConnect();
+        boolean validated = false;
         //all loop iterates the parameter's value, to check if it contains any numbers, since firstname/lastname doesn't have any numbers.
 
         for (int x = 0; x < firstName.length(); x++) { // iterates strings to check if it has numbers
             if (Character.toString(firstName.charAt(x)).matches(numbers)) {
                 System.out.println("INVALID firstname! Try again later.");
-                return false;
+                validated = false;
             }
         }
 
         for (int x = 0; x < lastName.length(); x++) {
             if (Character.toString(lastName.charAt(x)).matches(numbers)) {
                 System.out.println("INVALID lastname! Try again later.");
-                return false;
+                validated = false;
             }
         }
 
         if (firstName.isBlank() || lastName.isBlank() || address.isBlank()) { // if user doesn't put anything
             System.out.println("INVALID input! Don't leave it blank!");
-            return false;
+            validated = false;
         }
 
         else { // returns true to make the input validated if there was no error in input
-            return true;
+            try {
+                rs = stmt.executeQuery("SELECT * FROM customer WHERE firstname = '" + firstName + "' AND lastname = '" + lastName + "'");
+                if (rs.next()){
+                    validated = true;
+                }
+            } catch (SQLException e){
+                System.out.println(e.getMessage());
+                validated = false;
+            }
         }
+        return validated;
     }
 
     public boolean policyHolderName(String firstName, String lastName,

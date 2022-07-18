@@ -100,7 +100,7 @@ public class Vehicle extends DatabaseConnection {
                                 go.pauseClear();
                             }
 
-                            else if (year < 0 || vehiclePrice <= 0) {
+                            else if (year < 0 || vehiclePrice < 0) {
                                 System.out.println("INVALID! Year/Price cannot be negative number!");
                                 x--;
                             }
