@@ -6,7 +6,7 @@ public class CustomerAccount extends DatabaseConnection {
     private DisplayDesign go = new DisplayDesign();
     private Validation valid = new Validation();
 
-    public void createAccount() {
+    public void createAccount() { //method for creating an account
         String firstName, lastName, address;
         go.clearConsole(); // clears the terminal
 
@@ -21,7 +21,7 @@ public class CustomerAccount extends DatabaseConnection {
         System.out.print("Address: ");
         address = sc.nextLine();
 
-        if (valid.customerAccount(firstName, lastName, address) == true){
+        if (valid.customerAccount(firstName, lastName, address) == true){ //validates the inputs from validation class
             processQuery(firstName, lastName, address); // sends the values in the parameter in order to insert it in
         }
     }
@@ -53,7 +53,7 @@ public class CustomerAccount extends DatabaseConnection {
         }
     }
 
-    public void searchAccount() {
+    public void searchAccount() { //method for OPTION #5
         String firstName = "", lastName = "";
         go.clearConsole();
 
@@ -72,7 +72,7 @@ public class CustomerAccount extends DatabaseConnection {
         
     }
 
-    public void viewAccount(String firstName, String lastName) {
+    public void viewAccount(String firstName, String lastName) { //view the customer account's information, will be called by the method above
         dbConnect();
         int customerID = 0;
         try {

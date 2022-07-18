@@ -7,7 +7,7 @@ public class Policy extends DatabaseConnection {
     private DisplayDesign go = new DisplayDesign();
     private Validation valid = new Validation();
 
-    public void createPolicy() {
+    public void createPolicy() { //method for creating a policy
         calendar = Calendar.getInstance();
         PolicyHolder holder = new PolicyHolder();
         int accNum, month, day, year, monthExp, policyID;
@@ -18,8 +18,8 @@ public class Policy extends DatabaseConnection {
             System.out.print("Enter account number: ");
             accNum = sc.nextInt();
 
-            if (searchAccount(accNum) == true) {
-                while (true) {
+            if (searchAccount(accNum) == true) { //validates if there is account number in the table 
+                while (true) { //endless loop until the system is satisfied/ no errors were found
                     try {
                         go.clearConsole();
                         go.printBox("QUOTE POLICY FOR ACCOUNT #" + accNum);
@@ -34,7 +34,7 @@ public class Policy extends DatabaseConnection {
                         System.out.print("Year [" + calendar.get(Calendar.YEAR) + " onwards, 4 digits]: ");
                         year = sc.nextInt();
 
-                        if (valid.date(year, month, day) == true) {
+                        if (valid.date(year, month, day) == true) { //validates the date from user input
 
                             monthExp = month + 6; // sets the expiry month
                             policyID = processPolicyQuery(month, day, year, monthExp, accNum); // gets the policy
@@ -127,7 +127,7 @@ public class Policy extends DatabaseConnection {
         return policyID; // returns the number from query result
     }
 
-    public void cancelPolicy() {
+    public void cancelPolicy() { //method for OPTION #3
         int policyID;
         boolean policyIDExist;
         String choice, delConfirm;
@@ -139,27 +139,27 @@ public class Policy extends DatabaseConnection {
             System.out.print("Enter policy #: ");
             policyID = sc.nextInt();
 
-            policyIDExist = valid.searchPolicyID("SELECT policynumber from policy WHERE policynumber = " + policyID);
+            policyIDExist = valid.searchID("SELECT policynumber from policy WHERE policynumber = " + policyID);
 
-            if (policyIDExist == true) {
+            if (policyIDExist == true) { //executes if there is existing policyID
                 System.out.print(
                         "[1] - Remove/Delete policy \n[2] - Change expiration date to an earlier date \n\nChoose: ");
                 choice = sc.next();
                 choice += sc.nextLine();
 
                 switch (choice) {
-                    case "1":
+                    case "1": //case 1 for removal of policy/deletion
                         System.out.print("Are you sure to remove policy #" + policyID
                                 + "? [1] - Yes / [Any] - No: "); // confirmation before deleting from table
                         delConfirm = sc.nextLine();
                         if (delConfirm.equals("1")) {
-                            removePolicy(policyID);
+                            removePolicy(policyID); //calls the removePolicy method for complete process of removing the policy
                         } else {
                             System.out.println("Removal of policy #" + policyID + " has been cancelled.");
                         }
                         break;
 
-                    case "2":
+                    case "2": //for cancelling/adjusting date to earlier expiration
                         System.out.println("Current Expiry Date: " + showCurrentExpiryDate(policyID));
                         System.out.print("Month [1-12]: ");
                         newExpMonth = sc.nextInt();
@@ -168,8 +168,8 @@ public class Policy extends DatabaseConnection {
                         System.out.print("Year [4 digits]: ");
                         newExpYear = sc.nextInt();
 
-                        if (valid.dateRange(newExpMonth, newExpDay, newExpYear, policyID) == true) {
-                            changeExpiryDate(newExpYear, newExpMonth, newExpDay, policyID);
+                        if (valid.dateRange(newExpMonth, newExpDay, newExpYear, policyID) == true) { 
+                            changeExpiryDate(newExpYear, newExpMonth, newExpDay, policyID); //executes if the input date is within the range of policy date
                         }
 
                         break;
@@ -192,7 +192,7 @@ public class Policy extends DatabaseConnection {
 
     }
 
-    public void removePolicy(int policyID) {
+    public void removePolicy(int policyID) { //method for removing the policy on the table
         dbConnect();
         try {
             int result = stmt.executeUpdate("DELETE from policy where policynumber = " + policyID);
@@ -208,7 +208,7 @@ public class Policy extends DatabaseConnection {
         }
     }
 
-    public String showCurrentExpiryDate(int policyID) {
+    public String showCurrentExpiryDate(int policyID) { //method just for printing the current expiry date of the policy
         dbConnect();
         try {
             rs = stmt.executeQuery("SELECT expiredate from policy where policynumber = " + policyID);
@@ -225,7 +225,7 @@ public class Policy extends DatabaseConnection {
         }
     }
 
-    public void changeExpiryDate(int newExpYear, int newExpMonth, int newExpDay, int policyID) {
+    public void changeExpiryDate(int newExpYear, int newExpMonth, int newExpDay, int policyID) { //method for changing expiry date
         dbConnect();
         try {
             preparedStmt = conn
@@ -241,16 +241,16 @@ public class Policy extends DatabaseConnection {
         }
     }
 
-    public void searchPolicy() {
+    public void searchPolicy() { //method for OPTION #6
         int policyID;
         try {
             System.out.print("Type the policy number: ");
             policyID = sc.nextInt();
 
-            if (valid.searchPolicyID("SELECT policynumber from policy WHERE policynumber = " + policyID) == true) {
+            if (valid.searchID("SELECT policynumber from policy WHERE policynumber = " + policyID) == true) {
                 go.clearConsole();
                 go.printBox("POLICY #" + policyID + " INFORMATION");
-                showPolicy(policyID);
+                showPolicy(policyID); //calls this method if the given input is correct/ has existing record in the table
             }
 
             else {
@@ -264,7 +264,7 @@ public class Policy extends DatabaseConnection {
         }
     }
 
-    public void showPolicy(int policyID) {
+    public void showPolicy(int policyID) { //shows/prints the policy information
         dbConnect();
         String firstName = "", lastName = "";
         String[][] policyInformation = new String[2][5];

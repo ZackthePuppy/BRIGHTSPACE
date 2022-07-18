@@ -54,10 +54,5 @@ public class DisplayDesign { // this class is purely for design, and clearing co
         } catch (IOException | InterruptedException ex) {}
     }
 
-    public void lines(){
-        for (int x=0; x<50; x++){
-            System.out.print("=");
-        }
-    }
 
 }

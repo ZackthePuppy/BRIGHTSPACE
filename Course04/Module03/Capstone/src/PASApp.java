@@ -2,26 +2,26 @@ import java.util.Calendar;
 import java.util.Scanner;
 
 /**
-* Java Course 2 Module 1
-*
-* @author Mike Lemuel Chan
-* @Description: The final activity in Brightspace (capstone). This system
-                simulates the process of insurance specifically automobile.
-* @CreatedDate: 6/6/2022
-* @ModifiedDate: 7/5/2022
-*
-*/
+ * Java Course 2 Module 1
+ *
+ * @author Mike Lemuel Chan
+ * @Description: The final activity in Brightspace (capstone). This system
+ *               simulates the process of insurance specifically automobile.
+ * @CreatedDate: 6/6/2022
+ * @ModifiedDate: 7/18/2022
+ *
+ */
 
 public class PASApp {
 
-    public static void main(String[] args) throws Exception { //MAIN METHOD
+    public static void main(String[] args) throws Exception { // MAIN METHOD
         /*
-            Instantiation of classes 
-            take note that go.clearConsole is for clearing the console
-            and go.pauseClear is for prompting "Enter to continue", and upon
-            hitting ENTER, the terminal will also be cleared.
+         * Instantiation of classes
+         * take note that go.clearConsole is for clearing the console
+         * and go.pauseClear is for prompting "Enter to continue", and upon
+         * hitting ENTER, the terminal will also be cleared.
          */
-        DisplayDesign go = new DisplayDesign(); 
+        DisplayDesign go = new DisplayDesign();
         Scanner sc = new Scanner(System.in);
         Calendar calendar = Calendar.getInstance();
         CustomerAccount customer = new CustomerAccount();
@@ -34,8 +34,8 @@ public class PASApp {
 
         while (mainLoop) {
             db.checkDatabase(); // checks the connection in database
-            db.checkPolicyStatus(); // updates the status of policy everytime the loop continues 
-            
+            db.checkPolicyStatus(); // updates the status of policy everytime the loop continues
+
             go.printBox("AUTOMOBILE INSURANCE | " + calendar.getTime());
             System.out.println("[1] - Create new Customer Account \n[2] - Get Policy Quote & Buy the Plicy" +
                     "\n[3] - Cancel Specific Policy \n[4] - File an Accident Claim" +
@@ -63,17 +63,18 @@ public class PASApp {
                     break;
 
                 case "5":
-                    customer.searchAccount(); //searches for customer account
+                    customer.searchAccount(); // searches for customer account
                     break;
 
                 case "6":
-                policy.searchPolicy(); //searches for specific policy
+                    policy.searchPolicy(); // searches for specific policy
                     break;
 
-                case "7": //searches for specific claims
+                case "7": // searches for specific claims
+                    claim.searchClaim();
                     break;
 
-                case "8": //exits the program
+                case "8": // exits the program
                     System.out.println("Thank you and have a nice day!");
                     go.pauseClear();
                     sc.close();
@@ -81,12 +82,12 @@ public class PASApp {
                     db.conn.close();
                     break;
 
-                default: //if input is invalid
+                default: // if input is invalid
                     System.out.println("INVALID choice! Please Try again.");
                     go.pauseClear();
 
             }
-            go.pauseClear(); //pauses and clears the terminal window / console
+            go.pauseClear(); // pauses and clears the terminal window / console
         }
 
     }

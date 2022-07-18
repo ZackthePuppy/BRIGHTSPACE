@@ -100,7 +100,7 @@ public class PolicyHolder extends DatabaseConnection {
             licenseNum = sc.nextLine();
 
             if ((valid.policyHolderName(firstName, lastName, birthDate, address, licenseNum) == true)
-                    && (valid.licenseNumCheck(licenseNum) == true)) {
+                    && (valid.licenseNumCheck(licenseNum) == true)) { //continues the input if the given input above is correct
                 policyHolderLoop = false;
                 while (true) {
                     try {

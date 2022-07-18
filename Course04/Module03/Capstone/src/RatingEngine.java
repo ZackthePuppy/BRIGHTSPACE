@@ -1,6 +1,6 @@
 public class RatingEngine {
     
-    public double calculate (double vehiclePrice, double year, int driverYear) {
+    public double calculate (double vehiclePrice, double year, int driverYear) { //method for calculating the vehicle premium, then returns it
         double vehiclePriceFactor = 0, premium;
 
         //Conditions for the vehicle price factor

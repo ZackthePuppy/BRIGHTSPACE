@@ -1,6 +1,6 @@
 import java.sql.*;
 
-public class DatabaseConnection {
+public class DatabaseConnection { //this class is all about connecting to database, and updates table from every refresh in main menu
     Connection conn;
     Statement stmt, stmt2, stmt3;
     PreparedStatement preparedStmt;
@@ -20,7 +20,7 @@ public class DatabaseConnection {
         }
     }
 
-    protected void createDatabase() { // creates a new database and table
+    protected void createDatabase() { // creates a new database and table if there is no database found by default
         try {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/", "root", "");
             stmt = conn.createStatement();
