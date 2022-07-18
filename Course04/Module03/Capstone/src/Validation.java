@@ -10,7 +10,7 @@ public class Validation extends DatabaseConnection {
     String letters = "[A-z]";
 
     public boolean name(String firstName, String lastName) {
-
+        dbConnect();
         for (int x = 0; x < firstName.length(); x++) { // iterates strings to check if it has numbers
             if (Character.toString(firstName.charAt(x)).matches(numbers)) {
                 System.out.println("INVALID firstname! Try again later.");
@@ -31,50 +31,87 @@ public class Validation extends DatabaseConnection {
         }
 
         else {
-            return true;
-        }
-    }
-
-    public boolean customerAccount(String firstName, String lastName, String address) { //validates the customer's info
-        dbConnect();
-        boolean validated = false;
-        //all loop iterates the parameter's value, to check if it contains any numbers, since firstname/lastname doesn't have any numbers.
-
-        for (int x = 0; x < firstName.length(); x++) { // iterates strings to check if it has numbers
-            if (Character.toString(firstName.charAt(x)).matches(numbers)) {
-                System.out.println("INVALID firstname! Try again later.");
-                validated = false;
-            }
-        }
-
-        for (int x = 0; x < lastName.length(); x++) {
-            if (Character.toString(lastName.charAt(x)).matches(numbers)) {
-                System.out.println("INVALID lastname! Try again later.");
-                validated = false;
-            }
-        }
-
-        if (firstName.isBlank() || lastName.isBlank() || address.isBlank()) { // if user doesn't put anything
-            System.out.println("INVALID input! Don't leave it blank!");
-            validated = false;
-        }
-
-        else { // returns true to make the input validated if there was no error in input
             try {
                 rs = stmt.executeQuery("SELECT * FROM customer WHERE firstname = '" + firstName + "' AND lastname = '" + lastName + "'");
                 if (rs.next()){
-                    validated = true;
+                    return true;
+                }
+                else {
+                    System.out.println("No customer account found!");
+                    return false;
                 }
             } catch (SQLException e){
                 System.out.println(e.getMessage());
+                return false;
+            }
+        }
+    }
+
+    public boolean customerAccount(String firstName, String lastName, String address) { // validates the customer's info
+        dbConnect();
+        boolean validated = false;
+        // all loop iterates the parameter's value, to check if it contains any numbers,
+        // since firstname/lastname doesn't have any numbers.
+
+            for (int x = 0; x < firstName.length(); x++) { // iterates strings to check if it has numbers
+                if (Character.toString(firstName.charAt(x)).matches(numbers)) {
+                    System.out.println("INVALID firstname! Try again later.");
+                    validated = false;
+                }
+            }
+
+            for (int x = 0; x < lastName.length(); x++) {
+                if (Character.toString(lastName.charAt(x)).matches(numbers)) {
+                    System.out.println("INVALID lastname! Try again later.");
+                    validated = false;
+                }
+            }
+
+            if (firstName.isBlank() || lastName.isBlank() || address.isBlank()) { // if user doesn't put anything
+                System.out.println("INVALID input! Don't leave it blank!");
                 validated = false;
             }
+
+
+            else { 
+                try {
+                    rs = stmt.executeQuery("SELECT * FROM customer WHERE firstname = '" + firstName + "' AND lastname = '" + lastName + "'");
+                    if (rs.next()){
+                        System.out.println("Customer name already exist!");
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                } catch (SQLException e){
+                    System.out.println(e.getMessage());
+                    return false;
+                }
+            }
+       
+        return validated;
+    }
+
+    public boolean checkExistingCustomer(String firstName, String lastName) { // checks if there is existing account in
+                                                                              // the table
+        dbConnect();
+        boolean validated = false;
+        try {
+            rs = stmt.executeQuery(
+                    "SELECT * FROM customer WHERE firstname = '" + firstName + "' AND lastname = '" + lastName + "'");
+            if (rs.next() == true) {
+                validated = true;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            validated = false;
         }
         return validated;
     }
 
     public boolean policyHolderName(String firstName, String lastName,
-            String birthDate, String address, String licenseNum) { //validates the firstname, lastname, birthdate and address
+            String birthDate, String address, String licenseNum) { // validates the firstname, lastname, birthdate and
+                                                                   // address
         int firstDash, secondDash, year, month, day;
 
         try {
@@ -117,7 +154,7 @@ public class Validation extends DatabaseConnection {
         }
     }
 
-    public boolean licenseCheck(int year, int month, int day) { //checks the license date if it is correct
+    public boolean licenseCheck(int year, int month, int day) { // checks the license date if it is correct
         try {
             String dt = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.of(year, month + 1, day));
             LocalDate licenseDate = LocalDate.parse(dt);
@@ -178,7 +215,7 @@ public class Validation extends DatabaseConnection {
         return 0;
     }
 
-    public boolean vehicleCount(int vehicleNum) { //validates the vehicle count
+    public boolean vehicleCount(int vehicleNum) { // validates the vehicle count
         if (vehicleNum <= 0) {
             System.out.println("INVALID! Input cannot be zero/negative!");
             go.pauseClear();
@@ -194,7 +231,7 @@ public class Validation extends DatabaseConnection {
             String dt = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.of(year, month + 1, day));
             LocalDate givenDate = LocalDate.parse(dt);
 
-            if (String.valueOf(year).length() != 4) { //if the year length is not equal to 4
+            if (String.valueOf(year).length() != 4) { // if the year length is not equal to 4
                 System.out.println("INVALID! Year is incorrect!");
                 go.pauseClear();
                 return false;
@@ -215,7 +252,8 @@ public class Validation extends DatabaseConnection {
         }
     }
 
-    public boolean dateRange(int month, int day, int year, int policyID) { //this method checks whether the date is in range of the policy
+    public boolean dateRange(int month, int day, int year, int policyID) { // this method checks whether the date is in
+                                                                           // range of the policy
         dbConnect();
         boolean validated = false;
         try {
@@ -226,22 +264,24 @@ public class Validation extends DatabaseConnection {
 
             while (rs.next()) {
 
-                dtEffectDate = DateTimeFormatter.ISO_LOCAL_DATE //saves the effective date from resultset
+                dtEffectDate = DateTimeFormatter.ISO_LOCAL_DATE // saves the effective date from resultset
                         .format(LocalDate.of(rs.getInt(3), rs.getInt(1), rs.getInt(2)));
                 LocalDate effectDate = LocalDate.parse(dtEffectDate);
 
-                dtExpiryDate = DateTimeFormatter.ISO_LOCAL_DATE //for expiry
+                dtExpiryDate = DateTimeFormatter.ISO_LOCAL_DATE // for expiry
                         .format(LocalDate.of(rs.getInt(6), rs.getInt(4), rs.getInt(5)));
                 LocalDate oldExpiry = LocalDate.parse(dtExpiryDate);
 
-                dtNewExpiry = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.of(year, month, day)); //saves the new expiry date in a string
+                dtNewExpiry = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.of(year, month, day)); // saves the new
+                                                                                                       // expiry date in
+                                                                                                       // a string
                 LocalDate newExpiry = LocalDate.parse(dtNewExpiry);
 
-                if (newExpiry.isBefore(effectDate)) { //condition if the new expiry date is before the effective date
+                if (newExpiry.isBefore(effectDate)) { // condition if the new expiry date is before the effective date
                     System.out.println(
                             "INVALID! Given date must be within the range of policy date. \nTry again.");
                     validated = false;
-                } else if (newExpiry.isAfter(oldExpiry)) { //if the new expiry date is after the old expiry date
+                } else if (newExpiry.isAfter(oldExpiry)) { // if the new expiry date is after the old expiry date
                     System.out.println("INVALID! Given date must be within the range of policy date. \nTry again.");
                     validated = false;
                 }
@@ -259,7 +299,7 @@ public class Validation extends DatabaseConnection {
     }
 
     public boolean searchID(String query) { // search query to check if existing records found on a table
-                                                
+
         dbConnect();
         try {
 
@@ -277,31 +317,33 @@ public class Validation extends DatabaseConnection {
 
     }
 
-    public boolean accidentDateCheck (String accidentDate, int policyID){ //this method checks if given date is proper
+    public boolean accidentDateCheck(String accidentDate, int policyID) { // this method checks if given date is proper
         int firstDash, secondDash, year, month, day;
         boolean validated = false;
 
         try {
-        firstDash = accidentDate.indexOf("-", 0); //gets the index for the first dash in the string
-        secondDash = accidentDate.indexOf("-", firstDash + 1);
-        year = Integer.parseInt(accidentDate.substring(0, firstDash)); //trims the string to get just the year only
-        month = Integer.parseInt(accidentDate.substring(firstDash + 1, secondDash)); //trims to get the month
-        day = Integer.parseInt(accidentDate.substring(secondDash + 1)); //for day. Note that while trimming, we also converting it to string
+            firstDash = accidentDate.indexOf("-", 0); // gets the index for the first dash in the string
+            secondDash = accidentDate.indexOf("-", firstDash + 1);
+            year = Integer.parseInt(accidentDate.substring(0, firstDash)); // trims the string to get just the year only
+            month = Integer.parseInt(accidentDate.substring(firstDash + 1, secondDash)); // trims to get the month
+            day = Integer.parseInt(accidentDate.substring(secondDash + 1)); // for day. Note that while trimming, we
+                                                                            // also converting it to string
 
-        String dt = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.of(year, month, day)); //formatter for date from the trimmed strings
-        LocalDate.parse(dt); //validates if the date is real
+            String dt = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.of(year, month, day)); // formatter for date
+                                                                                                 // from the trimmed
+                                                                                                 // strings
+            LocalDate.parse(dt); // validates if the date is real
 
-        validated = dateRange(month, day, year, policyID); //gets the value from a boolean method which checks
-                                                            //if given date is in range of policy date
+            validated = dateRange(month, day, year, policyID); // gets the value from a boolean method which checks
+                                                               // if given date is in range of policy date
 
-        } catch (StringIndexOutOfBoundsException e){ //catching errors, also returns false because date is not proper
+        } catch (StringIndexOutOfBoundsException e) { // catching errors, also returns false because date is not proper
             System.out.println("Invalid date. " + e.getMessage());
             validated = false;
-        }
-         catch (DateTimeException e){
+        } catch (DateTimeException e) {
             System.out.println("Invalid date. " + e.getMessage());
             validated = false;
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             System.out.println("Invalid date. " + e.getMessage());
             validated = false;
         }
@@ -309,20 +351,20 @@ public class Validation extends DatabaseConnection {
 
     }
 
-    public boolean claimNumberFormat (String claimNumber){ //checks whether the claim number format is valid
+    public boolean claimNumberFormat(String claimNumber) { // checks whether the claim number format is valid
         boolean validated = false;
         try {
 
-            if (claimNumber.substring(1).length() != 5){
+            if (claimNumber.substring(1).length() != 5) {
                 System.out.println("Invalid claim number.");
-                validated = false; //returns false if given input length(excluding the 'C') is not equal to 5
+                validated = false; // returns false if given input length(excluding the 'C') is not equal to 5
             }
 
             else {
                 validated = true;
             }
-        } catch (StringIndexOutOfBoundsException e){
-            System.out.println("Invalid claim number. " +e.getMessage());
+        } catch (StringIndexOutOfBoundsException e) {
+            System.out.println("Invalid claim number. " + e.getMessage());
             validated = false;
         }
         return validated;

@@ -22,7 +22,8 @@ public class CustomerAccount extends DatabaseConnection {
         address = sc.nextLine();
 
         if (valid.customerAccount(firstName, lastName, address) == true){ //validates the inputs from validation class
-            processQuery(firstName, lastName, address); // sends the values in the parameter in order to insert it in
+                processQuery(firstName, lastName, address); // sends the values in the parameter in order to insert it in
+            
         }
     }
 
@@ -79,7 +80,7 @@ public class CustomerAccount extends DatabaseConnection {
             rs = stmt.executeQuery("SELECT * FROM customer WHERE firstname = '" + firstName
                     + "' and lastname = '" + lastName + "'");
 
-            if (rs.isBeforeFirst()) { // if resultset obtains record
+            if (rs.next()) { // if resultset obtains record
                 go.clearConsole();
                 while (rs.next()) {
                     customerID = rs.getInt(1);
